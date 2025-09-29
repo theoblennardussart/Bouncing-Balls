@@ -1,7 +1,5 @@
 package bouncing_balls;
 
-import bouncing_balls.utils.*;
-
 
 
 /**
@@ -76,6 +74,7 @@ class Model {
 
 	
 	void checkBallCollide(Ball b){
+
 		if (b.equals(balls[1])){return;} //calculates collision once per step
 		
 		//for cleaner code
@@ -88,12 +87,17 @@ class Model {
 		//check if they "overlap" aka if they are colliding
 		if(d <= b1.radius || d <= b2.radius){
 
-			b1.vx = calculateConservationOfMomentum(b1.mass, b2.mass, b1.vx, b2.vx);
-			b2.vx = calculateConservationOfMomentum(b2.mass, b1.mass, b2.vx, b1.vx);
+			double oldb1vx = b1.vx;   	// vi använde updaterade värden för att räkna ut värdet för hastighet efter kollision.
+			double oldb2vx = b2.vx;		// Better naming wouldn't hurt
+			double oldb1vy = b1.vy;
+			double oldb2vy = b2.vy;
+
+			b1.vx = calculateConservationOfMomentum(b1.mass, b2.mass, oldb1vx, oldb2vx);
+			b2.vx = calculateConservationOfMomentum(b2.mass, b1.mass, oldb2vx, oldb1vx);
 			System.out.println("This is the speed after collision:" + b1.vx);
 			System.out.println("This is the speed after collision:" + b2.vx);
-			b1.vy = calculateConservationOfMomentum(b1.mass, b2.mass, b1.vy, b2.vy);
-			b2.vy = calculateConservationOfMomentum(b2.mass, b1.mass, b2.vy, b1.vy);
+			b1.vy = calculateConservationOfMomentum(b1.mass, b2.mass, oldb1vy, oldb2vy);
+			b2.vy = calculateConservationOfMomentum(b2.mass, b1.mass, oldb2vy, oldb1vy);
 
 			balls[0] = b1;
 			balls[1] = b2;
