@@ -75,7 +75,6 @@ public final class Animator extends JPanel implements ActionListener {
 			Ellipse2D.Double e = new Ellipse2D.Double(x * pixelsPerMeter, this.getHeight() - (y * pixelsPerMeter),
 					b.radius * 2 * pixelsPerMeter, b.radius * 2 * pixelsPerMeter);
 			g2.fill(e);
-			g2.setColor(Color.BLUE);
 		}
 		Toolkit.getDefaultToolkit().sync();
 	}

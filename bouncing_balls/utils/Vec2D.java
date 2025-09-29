@@ -7,7 +7,6 @@ public class Vec2D {
     // Inte säker om allt kommer behövs. Ta bort innan inlämning
 
     public Vec2D(double x, double y) {
-
         this.x = x;
         this.y = y;
     }
@@ -20,7 +19,7 @@ public class Vec2D {
         return new Vec2D(this.x - other.x, this.y - other.y);
     }
 
-    public Vec2D multiply(double scalar) {
+    public Vec2D scale(double scalar) {
         return new Vec2D(this.x * scalar, this.y * scalar);
     }
 
@@ -39,11 +38,5 @@ public class Vec2D {
         }
         return new Vec2D(this.x / mag, this.y / mag);
     }
-
-    PolarCoord rectToPolar(double x, double y){
-		double r = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-		double theta = Math.atan2(y, x);
-		return new PolarCoord(r, theta);
-	}
 
 }
