@@ -1,5 +1,4 @@
 package bouncing_balls;
-
 import bouncing_balls.utils.PolarCoord;
 import bouncing_balls.utils.Vec2D;
 
@@ -14,97 +13,97 @@ import bouncing_balls.utils.Vec2D;
  *
  */
 class Model {
-
-	double areaWidth, areaHeight;
-
-	private final static double G = 9.82; //gravity
 	
+	double areaWidth, areaHeight;
+	private final static double G = 9.82; //gravitational constant (in Sweden)
 	Ball [] balls;
 
 	Model(double width, double height) {
+
 		areaWidth = width;
 		areaHeight = height;
 		
 		// Initialize the model with a few balls
 		balls = new Ball[2];
-		// balls[0] = new Ball(width / 3, height * 0.9, 1.2, 10.6, 0.2);
-		// // balls[1] = new Ball(width / 3, height * 0.9, 1.2, 1.6, 0.2);
-		// //balls[1].x = 2;
-		// balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3); // Removed for testing with two identical balls
-
-		balls[0] = new Ball(1, 1.9, 1, 0, 0.25);
-
-		balls[1] = new Ball(2, 2.1, 0, 0, 0.5);
+		balls[0] = new Ball(width / 3, height * 0.9, 1.2, 1.6, 0.2);
+		balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3); 
 
 	}
 
 	void step(double deltaT) {
-		// TODO this method implements one step of simulation with a step deltaT
+
+		/**
+		 * Moves the simulation forward in time by deltaT seconds.
+		 * 
+		 * @param deltaT - The time step, in seconds.
+		 */
 
 		for (Ball b : balls) {
-			checkWallCollide(b);
-			checkBallCollide(b);	
-			applyNewPosition(b, deltaT);
+			checkWallCollision(b);
+			checkBallCollision(b);
+			moveBall(b, deltaT);
 		}
 	}
 
-	void applyNewPosition(Ball b, double deltaT){
-		b.vx += 0 * deltaT; //speed doesn't change in the x-axis
-		b.vy -= G * deltaT; //gravity affects the y-axis TODO: Fixa så att gravity 
+	void moveBall(Ball b, double deltaT){
+
+		/** 
+		 * Updates the position of ball b
+		 * 
+		 * @param b - The specified ball
+		 */
+		
+		b.vx += 0 * deltaT; //Unecessary, but for symmetry
+		b.vy -= G * deltaT; //gravity's effect on the y-axis
+
+		//update position using euler's method
+
 		b.x += deltaT * b.vx;
-		b.y += deltaT * b.vy;		
+		b.y += deltaT * b.vy;
 	}
 
-	// Return the velocity of one ball after collision. in this case v1. Could be made clearer with better naming or method structure. 
-	double calculateConservationOfMomentum(double m1, double m2, double u1,  double u2){
-		double R = u2 - u1;
-		double I = m1*u1 + m2*u2;
-		return (I + m2*R)/(m1 + m2);
-	}
+	void checkWallCollision(Ball b){
 
-	void checkWallCollide(Ball b){       					// pot boolean?
-		// detect collision with the border
+		/**
+		 * Detect ball b collision with the border
+		 * 
+		 * @param b The ball to check for collision against the walls
+		 * 
+		 */ 
+
 		if (b.x < b.radius || b.x > areaWidth - b.radius) {
-			b.vx *= -1; // change direction of ball
+			b.vx *= -1;
 		}
 		if (b.y > areaHeight - b.radius) {
 			b.vy = -Math.abs(b.vy);
-			b.y = areaHeight - b.radius; //unstuck the balls
+			b.y = areaHeight - b.radius; //unstuck the balls in case speed gets really high
 		}
 		if (b.y < b.radius) {
 			b.vy = Math.abs(b.vy);
 			b.y = b.radius;		// Doesnt allow balls to sink through the ground
 		}
 	}
-
 	
-	void checkBallCollide(Ball b){
+	void checkBallCollision(Ball b){
 
-		if (b.equals(balls[1])){return;} //calculates collision once per step
+		/**
+		 * Detect collision between the balls and updates their speeds accordingly
+		 * 
+		 * @param b The ball to check for collision against the other ball
+		 * 
+		 */
+
+
+		if (b.equals(balls[1])){return;} //makes sure we calculate ball collision once per step
 		
 		//for cleaner code
 		Ball b1 = balls[0];
 		Ball b2 = balls[1];
 
-		//distance between the balls
-		double d = Math.sqrt(Math.pow(b1.x - b2.x,2) + Math.pow(b1.y - b2.y,2));
+		double distance = Math.sqrt(Math.pow(b1.x - b2.x,2) + Math.pow(b1.y - b2.y,2));
 
 		//check if they "overlap" aka if they are colliding
-		if(d <= b1.radius + b2.radius){
-
-			double oldb1vx = b1.vx;   	// vi använde updaterade värden för att räkna ut värdet för hastighet efter kollision.
-			double oldb2vx = b2.vx;		// Better naming wouldn't hurt
-			double oldb1vy = b1.vy;
-			double oldb2vy = b2.vy;
-
-			//b1.vx = calculateConservationOfMomentum(b1.mass, b2.mass, oldb1vx, oldb2vx);
-			//b2.vx = calculateConservationOfMomentum(b2.mass, b1.mass, oldb2vx, oldb1vx);
-			//b1.vy = calculateConservationOfMomentum(b1.mass, b2.mass, oldb1vy, oldb2vy);
-			//b2.vy = calculateConservationOfMomentum(b2.mass, b1.mass, oldb2vy, oldb1vy);
-
-			//balls[0] = b1;
-			//balls[1] = b2;
-
+		if(distance <= b1.radius + b2.radius){
 			
 			double contactAngle = Math.atan2((b1.vy-b2.vy), (b1.vx-b2.vx));
 			PolarCoord b1V = PolarCoord.recToPolar(b1.vx, b1.vy);
@@ -117,26 +116,37 @@ class Model {
 			b2.vx = newb2V.x;
 			b2.vy = newb2V.y;
 
-			double overlap = b1.radius + b2.radius - d;
+			//overlap to move the balls outside of each other, to make sure they don't collid next step
+			double overlap = b1.radius + b2.radius - distance;
 			double totalMass = b1.mass + b2.mass;
 			double overlapCorrection1 = overlap * (b2.mass / totalMass);
 			double overlapCorrection2 = overlap * (b1.mass / totalMass);
 
-			if(overlap > 0) {
-
-				b1.x -= overlapCorrection1*Math.cos(contactAngle);
-				b1.y -= overlapCorrection1*Math.sin(contactAngle);
-				b2.x += overlapCorrection2*Math.cos(contactAngle);
-				b2.y += overlapCorrection2*Math.sin(contactAngle);
-				
-			}
-
+			b1.x -= overlapCorrection1*Math.cos(contactAngle);
+			b1.y -= overlapCorrection1*Math.sin(contactAngle);
+			b2.x += overlapCorrection2*Math.cos(contactAngle);
+			b2.y += overlapCorrection2*Math.sin(contactAngle);
+			
+			//save onto the balls
 			balls[0] = b1;
 			balls[1] = b2;
 		}
 	}
 
 	Vec2D calculateBouncingSpeed(PolarCoord v1, double m1, PolarCoord v2, double m2, double contactAngle ){
+		
+		/**
+		 *  Calculates the new velocity vector of object v1 after an elisatic collision
+		 *  using v2, given their velocities, masses and the contact angle.
+		 * 
+		 * @param v1 Velocity of object 1 in polar coordinates
+		 * @param m1 Mass of object 1
+		 * @param v2 Velocity of object 2 in polar coordinates
+		 * @param m2 Mass of object 2
+		 * @param contactAngle Angle of contact between the two objects, in radians
+		 * @return New velocity of object 1 in Cartesian coordinates
+		 */
+		
 		double v1x, v1y;
 
 		double partially = ((v1.r * Math.cos(v1.theta-contactAngle)*(m1-m2)) + (2*m2*v2.r*Math.cos(v2.theta-contactAngle))) / (m1+m2);
@@ -162,7 +172,7 @@ class Model {
 		}
 
 		/**
-		 * Position, speed, and radius of the ball. You may wish to add other attributes.
+		 * Position, speed, radius, and mass of the ball
 		 */
 		double x, y, vx, vy, radius, mass;
 	}

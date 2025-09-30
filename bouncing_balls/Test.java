@@ -23,7 +23,6 @@ public class Test {
         Vec2D newVelVec1 = calculateVelocityAfterCollision(velVec1 ,velVec1Proj, massScaling1);
         Vec2D newVelVec2 = calculateVelocityAfterCollision(velVec2, velVec2Proj, massScaling2);
 
-
     }
 
     // calculating the projetion of vector v onto vector onto, to get the velocity component along the line of impact
@@ -43,4 +42,13 @@ public class Test {
 
         return v.subtract(projectedVector.scale(mass));
     }
+
+    
+	// Return the velocity of one ball after collision. in this case v1. Could be made clearer with better naming or method structure. 
+	double calculateConservationOfMomentum(double m1, double m2, double u1,  double u2){
+		double R = u2 - u1;
+		double I = m1*u1 + m2*u2;
+		return (I + m2*R)/(m1 + m2);
+	}
+
 }
